@@ -1,0 +1,1 @@
+memberSearchIndex = [{"p":"edu.lev.javadoc.application","c":"Calculator","l":"Calculator()","u":"%3Cinit%3E()"},{"p":"edu.lev.javadoc.application","c":"Calculator","l":"sum(int, int)","u":"sum(int,int)"}];updateSearchResults();

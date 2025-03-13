@@ -1,0 +1,1 @@
+tagSearchIndex = [{"l":"Calculadora","h":"class edu.lev.javadoc.application.Calculator","d":"Section","u":"edu/lev/javadoc/application/Calculator.html#calculadora-heading"}];updateSearchResults();
