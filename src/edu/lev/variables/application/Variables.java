@@ -1,6 +1,6 @@
 package edu.lev.variables.application;
 
-public class TiposVariaveis {
+public class Variables {
 
 	public static void main(String[] args) {
 		byte idade = 123;
