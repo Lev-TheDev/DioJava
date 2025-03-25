@@ -3,7 +3,7 @@ package edu.lev.conditionals.application;
 public class SwitchCase {
 
 	public static void main(String[] args) {
-		String plano = "B";
+		String plano = "M";
 		
 		switch (plano) {
 			case "T": {
