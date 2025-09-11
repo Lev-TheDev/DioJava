@@ -26,7 +26,7 @@ public class EventSchedule {
     }
 
     public void showNextEvent() {
-        //Set<LocalDate> dateSet = eventsMap.keySet();
+        //Set<LocalDateMain> dateSet = eventsMap.keySet();
         //Collection<Event> values = eventsMap.values(); // no relation between keys and values
 
         if (!eventsMap.isEmpty()) {
