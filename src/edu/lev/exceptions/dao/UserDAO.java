@@ -1,5 +1,6 @@
 package edu.lev.exceptions.dao;
 
+import edu.lev.exceptions.exceptions.EmptyStorageException;
 import edu.lev.exceptions.exceptions.UserNotFoundException;
 import edu.lev.exceptions.model.UserModel;
 
@@ -30,7 +31,15 @@ public class UserDAO {
     }
 
     public List<UserModel> findAll() {
-        return new ArrayList<>(models);
+        List<UserModel> result;
+        try {
+            verifyStorage();
+            result = models;
+        } catch (EmptyStorageException e) {
+            e.printStackTrace();
+            result = new ArrayList<>();
+        }
+        return result;
     }
 
     public UserModel findById(Long id) {
@@ -41,10 +50,17 @@ public class UserDAO {
         }
         return null;
     }*/
-       var message = String.format("User with id [%d] not found", id);
+        verifyStorage();
+        var message = String.format("User with id [%d] not found", id);
         return models.stream()
                 .filter(model -> model.getId().equals(id))
                 .findFirst()
                 .orElseThrow(() -> new UserNotFoundException(message));
+    }
+
+    private void verifyStorage(){
+        if (models.isEmpty()){
+            throw new EmptyStorageException("Storage is empty");
+        }
     }
 }

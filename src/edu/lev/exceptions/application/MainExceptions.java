@@ -1,6 +1,10 @@
 package edu.lev.exceptions.application;
 
 import edu.lev.exceptions.dao.UserDAO;
+import edu.lev.exceptions.exceptions.CustomException;
+import edu.lev.exceptions.exceptions.EmptyStorageException;
+import edu.lev.exceptions.exceptions.UserNotFoundException;
+import edu.lev.exceptions.exceptions.ValidatorException;
 import edu.lev.exceptions.model.MenuOption;
 import edu.lev.exceptions.model.UserModel;
 
@@ -10,6 +14,8 @@ import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Scanner;
+
+import static edu.lev.exceptions.validator.UserValidator.verifyModel;
 
 public class MainExceptions {
 
@@ -44,27 +50,55 @@ public class MainExceptions {
             var selectedOption = MenuOption.values()[userInput - 1];
             switch (selectedOption) {
                 case SAVE -> {
-                    System.out.println("Creating user...");
-                    var user = dao.save(requestToSave());
-                    System.out.println("User created successfully!");
-                    System.out.println(user);
+                    try {
+                        System.out.println("Creating user...");
+                        var user = dao.save(requestToSave());
+                        System.out.println("User created successfully!");
+                        System.out.println(user);
+                    } catch (CustomException e) {
+                        System.out.println("Validation error: " + e.getMessage());
+                        e.printStackTrace();
+                    } finally {
+                        System.out.println("======================");
+                    }
                 }
                 case UPDATE -> {
-                    System.out.println("Updating user...");
-                    var user = dao.update(requestToUpdate());
-                    System.out.println("User updated successfully!");
-                    System.out.println(user);
+                    try {
+                        System.out.println("Updating user...");
+                        var user = dao.update(requestToUpdate());
+                        System.out.println("User updated successfully!");
+                        System.out.println(user);
+                    } catch (UserNotFoundException | EmptyStorageException e) {
+                        System.out.println(e.getMessage());
+                    } catch (CustomException e) {
+                        System.out.println("Validation error: " + e.getMessage());
+                        e.printStackTrace();
+                    } finally {
+                        System.out.println("======================");
+                    }
                 }
                 case DELETE -> {
-                    System.out.println("Deleting user...");
-                    dao.delete(requestId());
-                    System.out.println("User deleted successfully!");
+                    try {
+                        System.out.println("Deleting user...");
+                        dao.delete(requestId());
+                        System.out.println("User deleted successfully!");
+                    } catch (UserNotFoundException | EmptyStorageException e) {
+                        System.out.println(e.getMessage());
+                    } finally {
+                        System.out.println("======================");
+                    }
                 }
                 case FIND_BY_ID -> {
-                    System.out.println("Finding user...");
-                    var user = dao.findById(requestId());
-                    System.out.println("User found successfully!");
-                    System.out.println(user);
+                    try {
+                        System.out.println("Finding user...");
+                        var user = dao.findById(requestId());
+                        System.out.println("User found successfully!");
+                        System.out.println(user);
+                    } catch (UserNotFoundException | EmptyStorageException e) {
+                        System.out.println(e.getMessage());
+                    } finally {
+                        System.out.println("======================");
+                    }
                 }
                 case FIND_ALL -> {
                     System.out.println("Listing all users...");
@@ -84,7 +118,7 @@ public class MainExceptions {
         return scanner.nextLong();
     }
 
-    private static UserModel requestToSave(){
+    private static UserModel requestToSave() {
         System.out.println("Enter user name:");
         var name = scanner.next();
         System.out.println("Enter user email:");
@@ -93,10 +127,20 @@ public class MainExceptions {
         var birthdateStr = scanner.next();
         var formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
         var birthdate = LocalDate.parse(birthdateStr, formatter);
-        return new UserModel(0L, name, email, birthdate);
+        return validateInputs(0, name, email, birthdate);
     }
 
-    private static UserModel requestToUpdate(){
+    private static UserModel validateInputs(final long id, final String name, final String email, final LocalDate birthdate) {
+        var user = new UserModel(0L, name, email, birthdate);
+        try {
+            verifyModel(user);
+            return user;
+        } catch (ValidatorException e) {
+            throw new CustomException("Error validating user: " + e.getMessage(), e);
+        }
+    }
+
+    private static UserModel requestToUpdate() {
         System.out.println("Enter user id:");
         var id = scanner.nextLong();
         System.out.println("Enter user name:");
@@ -107,6 +151,6 @@ public class MainExceptions {
         var birthdateStr = scanner.next();
         var formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
         var birthdate = LocalDate.parse(birthdateStr, formatter);
-        return new UserModel(id, name, email, birthdate);
+        return validateInputs(id, name, email, birthdate);
     }
 }
