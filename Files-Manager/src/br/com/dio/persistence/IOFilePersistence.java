@@ -1,6 +1,9 @@
 package br.com.dio.persistence;
 
 import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Stream;
 
 public class IOFilePersistence implements FilePersistence {
 
@@ -34,12 +37,33 @@ public class IOFilePersistence implements FilePersistence {
 
     @Override
     public boolean remove(final String sentence) {
-        return false;
+        var contentList = toListString();
+        if (contentList.stream().noneMatch(line -> line.contains(sentence))) {
+            return false;
+        }
+        clearFile();
+        contentList.stream().filter(line -> !line.contains(sentence)).forEach(this::write);
+        return true;
     }
 
     @Override
     public String replace(final String oldContent, final String newContent) {
-        return null;
+        var contentList = toListString();
+        if (contentList.stream().noneMatch(line -> line.contains(oldContent))) {
+            return "Conteúdo não encontrado para substituição.";
+        }
+        clearFile();
+        contentList.stream()
+                .map(line -> line.replace(oldContent, newContent))
+                .forEach(this::write);
+        return newContent;
+    }
+
+    private List<String> toListString() {
+        var content = findAll();
+        return new ArrayList<>(Stream
+                .of(content.split(System.lineSeparator()))
+                .toList());
     }
 
     @Override
@@ -61,7 +85,20 @@ public class IOFilePersistence implements FilePersistence {
 
     @Override
     public String findBy(final String sentence) {
-        return null;
+        String found = "";
+        try(var reader = new BufferedReader(new FileReader(currentDir + storedDir + fileName))){
+            String line = reader.readLine();
+            while (line != null) {
+                if(line.contains(sentence)){
+                    found = line;
+                    break;
+                }
+                line = reader.readLine();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return found;
     }
 
     private void clearFile() {

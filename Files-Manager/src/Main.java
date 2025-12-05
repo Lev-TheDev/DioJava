@@ -13,8 +13,22 @@ public class Main {
         System.out.println("===========================================");
         System.out.println(persistence.write("Amanda;amanda@bol.com;14/07/1995"));
         System.out.println("===========================================");
-        System.out.println(persistence.findAll());
+        System.out.print(persistence.findAll());
         System.out.println("===========================================");
-
+        System.out.println(persistence.remove("Caio"));
+        System.out.println("===========================================");
+        System.out.println(persistence.remove("24"));
+        System.out.println("===========================================");
+        System.out.println(persistence.findBy("Lucas"));
+        System.out.println("===========================================");
+        System.out.println(persistence.findBy("1994"));
+        System.out.println("===========================================");
+        System.out.println(persistence.findBy("amanda@"));
+        System.out.println("===========================================");
+        System.out.println(persistence.replace("Amanda", "Amandinha"));
+        System.out.println("===========================================");
+        System.out.println(persistence.replace("max", "21"));
+        System.out.println("===========================================");
+        System.out.println(persistence.findAll());
     }
 }
