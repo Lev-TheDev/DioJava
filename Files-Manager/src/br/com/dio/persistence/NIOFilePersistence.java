@@ -6,16 +6,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
-public class NIOFilePersistence implements FilePersistence{
-
-    private final String currentDir = System.getProperty("user.dir"); // retorna o diretório atual do projeto
-
-    private final String storedDir = "/managedFiles/NIO/"; // diretório onde os arquivos serão armazenados
-
-    private final String fileName;
+public class NIOFilePersistence extends FilePersistence{
 
     public NIOFilePersistence(String fileName) throws IOException {
-        this.fileName = fileName;
+        super(fileName, "/managedFiles/NIO/");
         File file = new File(currentDir + storedDir);
         if(!file.exists() && !file.mkdirs()) throw new IOException("Erro ao criar arquivo.");
         clearFile();
@@ -31,32 +25,6 @@ public class NIOFilePersistence implements FilePersistence{
             e.printStackTrace();
         }
         return data;
-    }
-
-    @Override
-    public boolean remove(String sentence) {
-        var contentList = toListString();
-
-        if (contentList.stream().noneMatch(line -> line.contains(sentence))) {
-            return false;
-        }
-        clearFile();
-        contentList.stream().filter(line -> !line.contains(sentence)).forEach(this::write);
-        return true;
-    }
-
-    @Override
-    public String replace(String oldContent, String newContent) {
-        var contentList = toListString();
-
-        if (contentList.stream().noneMatch(line -> line.contains(oldContent))) {
-            return "Conteúdo não encontrado para substituição.";
-        }
-        clearFile();
-        contentList.stream()
-                .map(line -> line.contains(oldContent) ? newContent : line)
-                .forEach(this::write);
-        return newContent;
     }
 
     @Override
@@ -111,20 +79,5 @@ public class NIOFilePersistence implements FilePersistence{
             e.printStackTrace();
         }
         return content.toString();
-    }
-
-    private List<String> toListString() {
-        var content = findAll();
-        return new ArrayList<>(Stream
-                .of(content.split(System.lineSeparator()))
-                .toList());
-    }
-
-    private void clearFile() {
-        try (OutputStream outputStream = new FileOutputStream(currentDir + storedDir + fileName)) {
-            System.out.printf("Preparando arquivo limpo para uso... (%s) \n", currentDir + storedDir + fileName);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 }
