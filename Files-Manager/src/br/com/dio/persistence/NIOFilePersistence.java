@@ -2,6 +2,9 @@ package br.com.dio.persistence;
 
 import java.io.*;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Stream;
 
 public class NIOFilePersistence implements FilePersistence{
 
@@ -32,12 +35,28 @@ public class NIOFilePersistence implements FilePersistence{
 
     @Override
     public boolean remove(String sentence) {
-        return false;
+        var contentList = toListString();
+
+        if (contentList.stream().noneMatch(line -> line.contains(sentence))) {
+            return false;
+        }
+        clearFile();
+        contentList.stream().filter(line -> !line.contains(sentence)).forEach(this::write);
+        return true;
     }
 
     @Override
     public String replace(String oldContent, String newContent) {
-        return null;
+        var contentList = toListString();
+
+        if (contentList.stream().noneMatch(line -> line.contains(oldContent))) {
+            return "Conteúdo não encontrado para substituição.";
+        }
+        clearFile();
+        contentList.stream()
+                .map(line -> line.contains(oldContent) ? newContent : line)
+                .forEach(this::write);
+        return newContent;
     }
 
     @Override
@@ -92,6 +111,13 @@ public class NIOFilePersistence implements FilePersistence{
             e.printStackTrace();
         }
         return content.toString();
+    }
+
+    private List<String> toListString() {
+        var content = findAll();
+        return new ArrayList<>(Stream
+                .of(content.split(System.lineSeparator()))
+                .toList());
     }
 
     private void clearFile() {
