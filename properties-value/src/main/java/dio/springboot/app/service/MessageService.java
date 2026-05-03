@@ -1,5 +1,6 @@
 package dio.springboot.app.service;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
@@ -8,9 +9,12 @@ import java.util.List;
 @Component
 public class MessageService implements CommandLineRunner {
 
-    private String name = "Jon Doe";
-    private String email = "jondoe@dio.com";
-    private List<Long> phoneNumbers = List.of(123456789L, 987654321L);
+    @Value("${name:New User}") // se a propriedade "name" não for encontrada, usará "Default Name"
+    private String name;
+    @Value("${email}")
+    private String email;
+    @Value("${phoneNumbers}")
+    private List<Long> phoneNumbers;
 
     @Override
     public void run(String... args) throws Exception {
